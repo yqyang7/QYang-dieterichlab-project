@@ -1,0 +1,54 @@
+>>> import pandas as pd
+>>> import seaborn as sns
+>>> import matplotlib.pyplot as plt
+>>> psi = pd.read_csv("/prj/Qingyang/psi_cov10.bed", sep=r'\s+', low_memory=False)
+BID = pd.read_csv>>> BID = pd.read_csv("/prj/Qingyang/BID_seq_HEK293T.bed", sep=r'\s+', low_memory=False)
+>>> merged_data = pd.merge(psi, BID, on=['chrom', 'chromStart', 'chromEnd', 'strand'],how='inner',suffixes=('_psi', '_BID'))
+>>> result = merged_data[['chrom', 'chromStart', 'chromEnd', 'strand', 'score_BID', 'frequency']]
+>>> result.columns = ['chrom', 'chromStart', 'chromEnd', 'strand', 'BID_score', 'psi_frequency']
+>>> correlation = result['BID_score'].corr(result['psi_frequency'])
+>>> num_sites = len(result)
+>>> sns.set(style="whitegrid")
+>>> # histograms
+>>> plt.figure(figsize=(8, 4))
+<Figure size 800x400 with 0 Axes>
+>>> plt.subplot(1, 2, 1)
+<Axes: >
+>>> sns.histplot(result['BID_score'], bins=30, kde=True, color="blue", alpha=0.6)
+<Axes: xlabel='BID_score', ylabel='Count'>
+>>> plt.xlabel("BID Score")
+Text(0.5, 0, 'BID Score')
+>>> plt.ylabel("Count")
+Text(0, 0.5, 'Count')
+>>> plt.title("BID Score Distribution\nTotal sites: {}".format(num_sites), fontsize=14, fontweight='bold')
+Text(0.5, 1.0, 'BID Score Distribution\nTotal sites: 499')
+>>> plt.subplot(1, 2, 2)
+<Axes: >
+>>> sns.histplot(result['psi_frequency'], bins=30, kde=True, color="green", alpha=0.6)
+<Axes: xlabel='psi_frequency', ylabel='Count'>
+>>> plt.xlabel("psi Frequency")
+Text(0.5, 0, 'psi Frequency')
+>>> plt.ylabel("Count")
+Text(0, 0.5, 'Count')
+>>> plt.title("psi Frequency Distribution\nTotal sites: {}".format(num_sites), fontsize=14, fontweight='bold')
+Text(0.5, 1.0, 'psi Frequency Distribution\nTotal sites: 499')
+>>> plt.tight_layout()
+>>> plt.savefig("histograms_BID_psi_with_totals.png")
+>>> plt.show()
+>>> # scatterplot
+>>> plt.figure(figsize=(6, 4))
+<Figure size 600x400 with 0 Axes>
+>>> sns.scatterplot(x='BID_score', y='psi_frequency', data=result, color="blue", alpha=0.7)
+<Axes: xlabel='BID_score', ylabel='psi_frequency'>
+>>> sns.regplot(x='BID_score', y='psi_frequency', data=result, scatter=False, color="red", line_kws={'linestyle': 'dashed', 'linewidth': 2})
+<Axes: xlabel='BID_score', ylabel='psi_frequency'>
+>>> plt.title("Scatterplot of BID_score vs psi_frequency\nTotal sites: {} | Correlation: {:.3f}".format(num_sites, correlation), fontsize=14, fontweight='bold')
+Text(0.5, 1.0, 'Scatterplot of BID_score vs psi_frequency\nTotal sites: 499 | Correlation: 0.828')
+>>> plt.xlabel("BID_score", fontsize=12)
+Text(0.5, 0, 'BID_score')
+>>> plt.ylabel("psi_frequency", fontsize=12)
+Text(0, 0.5, 'psi_frequency')
+>>> plt.tight_layout()
+>>> plt.savefig("scatterplot_BID_vs_psi.png")
+>>> plt.show()
+>>> exit()

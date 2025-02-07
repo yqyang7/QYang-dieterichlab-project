@@ -1,0 +1,54 @@
+>>> import pandas as pd
+>>> import seaborn as sns
+>>> import matplotlib.pyplot as plt
+>>> data = pd.read_csv("/prj/Qingyang/m6A_cov10.bed", sep='\t', low_memory=False)
+>>> glo = pd.read_csv("/prj/Qingyang/GLORI.chrALL.tsv", sep=r'\s+', low_memory=False)
+>>> merged_data = pd.merge(data, glo, on=['chrom', 'chromStart', 'chromEnd', 'strand'], how='inner', suffixes=('_data', '_glo'))
+>>> result = merged_data[['chrom', 'chromStart', 'chromEnd', 'strand', 'score_glo', 'frequency']]
+>>> result.columns = ['chrom', 'chromStart', 'chromEnd', 'strand', 'GLORI_score', 'm6A_frequency']
+>>> correlation = result['GLORI_score'].corr(result['m6A_frequency'])
+>>> num_sites = len(result)
+>>> sns.set(style="whitegrid")
+>>> # histograms
+>>> plt.figure(figsize=(8, 4))
+<Figure size 800x400 with 0 Axes>
+>>> plt.subplot(1, 2, 1)
+<Axes: >
+>>> sns.histplot(result['GLORI_score'], bins=30, kde=True, color="blue", alpha=0.6)
+<Axes: xlabel='GLORI_score', ylabel='Count'>
+>>> plt.xlabel("GLORI Score")
+Text(0.5, 0, 'GLORI Score')
+>>> plt.ylabel("Count")
+Text(0, 0.5, 'Count')
+>>> plt.title("GLORI Score Distribution\nTotal sites: {}".format(num_sites), fontsize=14, fontweight='bold')
+Text(0.5, 1.0, 'GLORI Score Distribution\nTotal sites: 130678')
+>>> plt.subplot(1, 2, 2)
+<Axes: >
+>>> sns.histplot(result['m6A_frequency'], bins=30, kde=True, color="green", alpha=0.6)
+<Axes: xlabel='m6A_frequency', ylabel='Count'>
+>>> plt.xlabel("m6A Frequency")
+Text(0.5, 0, 'm6A Frequency')
+>>> plt.ylabel("Count")
+Text(0, 0.5, 'Count')
+>>> plt.title("m6A Frequency Distribution\nTotal sites: {}".format(num_sites), fontsize=14, fontweight='bold')
+Text(0.5, 1.0, 'm6A Frequency Distribution\nTotal sites: 130678')
+>>> plt.tight_layout()
+>>> plt.savefig("histograms_GLORI_Nanopore_with_totals.png")
+>>> plt.show()
+>>> # scatterplot
+>>> plt.figure(figsize=(6, 4))
+<Figure size 600x400 with 0 Axes>
+>>> sns.scatterplot(x='GLORI_score', y='m6A_frequency', data=result, color="blue", alpha=0.7)
+<Axes: xlabel='GLORI_score', ylabel='m6A_frequency'>
+>>> sns.regplot(x='GLORI_score', y='m6A_frequency', data=result, scatter=False, color="red", line_kws={'linestyle': 'dashed', 'linewidth': 2})
+<Axes: xlabel='GLORI_score', ylabel='m6A_frequency'>
+>>> plt.title("Scatterplot of GLORI_score vs m6A_frequency\nTotal sites: {} | Correlation: {:.3f}".format(num_sites, correlation), fontsize=14, fontweight='bold')
+Text(0.5, 1.0, 'Scatterplot of GLORI_score vs m6A_frequency\nTotal sites: 130678 | Correlation: 0.907')
+>>> plt.xlabel("GLORI_score", fontsize=12)
+Text(0.5, 0, 'GLORI_score')
+>>> plt.ylabel("m6A_frequency", fontsize=12)
+Text(0, 0.5, 'm6A_frequency')
+>>> plt.tight_layout()
+>>> plt.savefig("scatterplot_GLORI_vs_m6A.png")
+>>> plt.show()
+>>> exit()
