@@ -1,0 +1,27 @@
+>>> import pandas as pd
+>>> import logomaker
+>>> import matplotlib.pyplot as plt
+>>> df = pd.read_csv("/prj/Qingyang/grouped_sites_with_5mer_new.csv", sep='\t',low_memory=False)
+>>> sequences = df["5mer_context"]
+>>> info_matrix = logomaker.alignment_to_matrix(sequences, to_type="information")
+>>> plt.figure(figsize=(16, 6))
+<Figure size 1600x600 with 0 Axes>
+>>> logo = logomaker.Logo(info_matrix, center_values=True, width=0.8)
+>>> logo.ax.set_ylabel("Information Content (bits)")
+Text(0, 0.5, 'Information Content (bits)')
+>>> logo.ax.set_ylabel("Shannon Entropy(bits)")
+Text(0, 0.5, 'Shannon Entropy(bits)')
+>>> logo.ax.set_xlabel("Position in 5mer")
+Text(0.5, 0, 'Position in 5mer')
+>>> logo.ax.set_xticks(range(len(info_matrix)))
+[<matplotlib.axis.XTick object at 0x7f819af7dbd0>, <matplotlib.axis.XTick object at 0x7f819d491110>, <matplotlib.axis.XTick object at 0x7f819af52cd0>, <matplotlib.axis.XTick object at 0x7f819af08fd0>, <matplotlib.axis.XTick object at 0x7f819af0b5d0>]
+>>> logo.ax.set_xticklabels(range(1, len(info_matrix) + 1))
+[Text(0, 0, '1'), Text(1, 0, '2'), Text(2, 0, '3'), Text(3, 0, '4'), Text(4, 0, '5')]
+>>> logo.ax.set_ylim([-2, 2])
+(-2.0, 2.0)
+>>> logo.style_spines(visible=False)
+>>> logo.style_xticks(rotation=0, fmt="%d", anchor=0)
+>>> logo.style_glyphs(fade_below=0.2)
+>>> plt.show()
+>>> plt.savefig("GLORI_m6A_5mer_logo_optimized.png", dpi=300, bbox_inches="tight")
+>>> exit()
