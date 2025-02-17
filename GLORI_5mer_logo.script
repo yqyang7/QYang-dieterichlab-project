@@ -1,0 +1,57 @@
+>>> import pandas as pd
+>>> import logomaker
+>>> import matplotlib.pyplot as plt
+>>> df = pd.read_csv("/prj/Qingyang/GLORI.chrALL.tsv", sep='\t',low_memory=False)
+>>> print(df.head(10))
+  chrom  chromStart  chromEnd name  score strand ref5mer
+0     1     1600376   1600377  m6A   31.1      +   GGACC
+1     1     1600473   1600474  m6A   15.4      +   GGACT
+2     1     1600621   1600622  m6A   25.7      +   AGACT
+3     1     1601001   1601002  m6A   25.7      +   GGACT
+4     1     1601143   1601144  m6A   18.3      +   GGACC
+5     1     1601203   1601204  m6A   56.6      +   AGACT
+6     1     1601293   1601294  m6A   23.2      +   GAATT
+7     1     1601515   1601516  m6A   45.5      +   AGACC
+8     1     1601840   1601841  m6A   50.6      +   GGACA
+9     1     1602008   1602009  m6A   24.4      +   AGACT
+>>> m6a = pd.read_csv("/prj/Qingyang/m6A_cov10.bed", sep='\t',low_memory=False)
+>>> print(m6a.head(10))
+  chrom  chromStart  chromEnd name  score strand  thickStart  thickEnd  itemRgb  coverage  frequency
+0     1       14378     14379    a     10      -       14378     14379  255,0,0        10       0.00
+1     1       14381     14382    a     17      -       14381     14382  255,0,0        17       0.00
+2     1       14382     14383    a     14      -       14382     14383  255,0,0        14       0.00
+3     1       14383     14384    a     12      -       14383     14384  255,0,0        12       0.00
+4     1       14385     14386    a     11      -       14385     14386  255,0,0        11       0.00
+5     1       14397     14398    a     12      -       14397     14398  255,0,0        12      25.00
+6     1       14399     14400    a     23      -       14399     14400  255,0,0        23       0.00
+7     1       14400     14401    a     21      -       14400     14401  255,0,0        21       4.76
+8     1       14403     14404    a    142      -       14403     14404  255,0,0       142       1.41
+9     1       14404     14405    a     98      -       14404     14405  255,0,0        98       2.04
+>>> seqGLO = df["ref5mer"]
+>>> sequences = df["ref5mer"]
+>>> info_matrix = logomaker.alignment_to_matrix(sequences, to_type="information")
+>>> plt.figure(figsize=(10, 4))
+<Figure size 1000x400 with 0 Axes>
+>>> logo = logomaker.Logo(info_matrix, center_values=True, width=0.8)
+>>> logo.ax.set_ylabel("Information Content (bits)")
+Text(0, 0.5, 'Information Content (bits)')
+>>> logo.ax.set_ylabel("Shannon Entropy(bits)")
+Text(0, 0.5, 'Shannon Entropy(bits)')
+>>> logo.ax.set_xlabel("Position in 5mer")
+Text(0.5, 0, 'Position in 5mer')
+>>> logo.ax.set_title("logomaker GLORI 5mer", fontsize=16, fontweight='bold')
+Text(0.5, 1.0, 'logomaker GLORI 5mer')
+>>> logo.ax.set_title("logomaker GLORI 5mer", fontsize=10, fontweight='bold')
+Text(0.5, 1.0, 'logomaker GLORI 5mer')
+>>> logo.ax.set_xticks(range(len(info_matrix)))
+[<matplotlib.axis.XTick object at 0x7f1a841c9390>, <matplotlib.axis.XTick object at 0x7f1a842083d0>, <matplotlib.axis.XTick object at 0x7f1a84203810>, <matplotlib.axis.XTick object at 0x7f1a84243450>, <matplotlib.axis.XTick object at 0x7f1a842558d0>]
+>>> logo.ax.set_xticklabels(range(1, len(info_matrix) + 1))
+[Text(0, 0, '1'), Text(1, 0, '2'), Text(2, 0, '3'), Text(3, 0, '4'), Text(4, 0, '5')]
+>>> logo.ax.set_ylim([-2, 2])
+(-2.0, 2.0)
+>>> logo.style_spines(visible=False)
+>>> logo.style_xticks(rotation=0, fmt="%d", anchor=0)
+>>> logo.style_glyphs(fade_below=0.2)
+>>> plt.savefig("GLORI_5mer_logo.png", dpi=300, bbox_inches="tight")
+>>> plt.show()
+>>> exit()
