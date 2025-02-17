@@ -1,0 +1,45 @@
+>>> from Bio import SeqIO
+>>> genome_reference = "/biodb/genomes/homo_sapiens/GRCh38_102/GRCh38_102.fa"
+>>> genome_dict = {}
+>>> for record in SeqIO.parse(genome_reference, "fasta"):
+...     genome_dict[record.id] = record.seq
+... 
+>>> from Bio.Seq import Seq
+>>> def reverse_complement(sequence):
+...     return str(Seq(sequence).reverse_complement())
+... 
+>>> import pandas as pd
+df = pd.rea>>> df = pd.read_csv("/prj/Qingyang/m6A_cov10.bed", sep='\t', low_memory=False)
+>>> print(df.columns.tolist())
+['chrom', 'chromStart', 'chromEnd', 'name', 'score', 'strand', 'thickStart', 'thickEnd', 'itemRgb', 'coverage', 'frequency']
+>>> def get_5mer_context(row):
+...     chrom = row['chrom']
+...     start = row['chromStart']
+...     strand = row['strand']
+...     if chrom not in genome_dict:
+...             return "NA"
+...     chrom_sequence = genome_dict[chrom]
+...     if start < 2 or start >= len(chrom_sequence) - 2:
+...             return "NA"
+...     context = chrom_sequence[start - 2:start + 3]
+...     if strand == '-':
+...             context = reverse_complement(context)
+...     return context
+... 
+>>> df['5mer_context'] = df.apply(get_5mer_context, axis=1)
+>>> df.to_csv("m6A_5mer.csv", sep='\t', index=False)
+>>> fivemer = pd.read_csv("m6A_5mer.csv", sep='\t', low_memory=False)
+>>> print(fivemer.head(10))
+  chrom  chromStart  chromEnd name  score strand  thickStart  thickEnd  itemRgb  coverage  frequency 5mer_context
+0     1       14378     14379    a     10      -       14378     14379  255,0,0        10       0.00        GGATC
+1     1       14381     14382    a     17      -       14381     14382  255,0,0        17       0.00        AAAGG
+2     1       14382     14383    a     14      -       14382     14383  255,0,0        14       0.00        TAAAG
+3     1       14383     14384    a     12      -       14383     14384  255,0,0        12       0.00        ATAAA
+4     1       14385     14386    a     11      -       14385     14386  255,0,0        11       0.00        TAATA
+5     1       14397     14398    a     12      -       14397     14398  255,0,0        12      25.00        ACAGT
+6     1       14399     14400    a     23      -       14399     14400  255,0,0        23       0.00        CAACA
+7     1       14400     14401    a     21      -       14400     14401  255,0,0        21       4.76        CCAAC
+8     1       14403     14404    a    142      -       14403     14404  255,0,0       142       1.41        AAACC
+9     1       14404     14405    a     98      -       14404     14405  255,0,0        98       2.04        GAAAC
+>>> df.to_csv("/prj/Qingyang/m6A_cov10_with5mer.csv", sep='\t', index=False)
+>>> exit()
