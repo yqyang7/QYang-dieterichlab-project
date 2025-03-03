@@ -1,0 +1,58 @@
+>>> import pandas as pd
+>>> import seaborn as sns
+import matplotlib.>>> import matplotlib.pyplot as plt
+>>> BID = pd.read_csv("/prj/Qingyang/BID_seq_HEK293T.bed", sep=r'\s+', low_memory=False)
+>>> print(BID.head(10))
+  chrom  chromStart  chromEnd name  score strand ref5mer  BID-Seq
+0     1     1045780   1045781  psi    7.7      +   GATGA     12.4
+1     1     1051519   1051520  psi   23.4      +   CTTTG     73.3
+2     1     1082417   1082418  psi   63.9      -   GTTCC     90.5
+3     1     1254956   1254957  psi   13.1      -   TGTAG     45.5
+4     1     1336109   1336110  psi    9.3      -   GGTGG     12.4
+5     1     2589932   2589933  psi   10.3      +   GGTGG     15.4
+6     1     6185969   6185970  psi   18.4      -   TGTAG     59.0
+7     1     6186767   6186768  psi   10.2      -   CGTGA     21.3
+8     1     6222864   6222865  psi   26.7      -   GTTAG     53.5
+9     1     6623606   6623607  psi   51.2      +   GTTCG     81.8
+>>> psi = pd.read_csv("/prj/Qingyang/psi_cov10.bed", sep=r'\s+', low_memory=False)
+>>> print(psi.head(10))
+  chrom  chromStart  chromEnd   name  score strand  thickStart  thickEnd  itemRgb  coverage  frequency
+0     1       14384     14385  17802     11      -       14384     14385  255,0,0        11       9.09
+1     1       14387     14388  17802     15      -       14387     14388  255,0,0        15       0.00
+2     1       14390     14391  17802     10      -       14390     14391  255,0,0        10      30.00
+3     1       14393     14394  17802     14      -       14393     14394  255,0,0        14       7.14
+4     1       14395     14396  17802     12      -       14395     14396  255,0,0        12       0.00
+5     1       14412     14413  17802    153      -       14412     14413  255,0,0       153       1.31
+6     1       14420     14421  17802    130      -       14420     14421  255,0,0       130       8.46
+7     1       14424     14425  17802    152      -       14424     14425  255,0,0       152       1.32
+8     1       14435     14436  17802     16      -       14435     14436  255,0,0        16       0.00
+9     1       14446     14447  17802    132      -       14446     14447  255,0,0       132       9.09
+>>> num_sites = len(BID)
+>>> sns.set(style="whitegrid")
+>>> plt.figure(figsize=(8, 4))
+<Figure size 800x400 with 0 Axes>
+>>> sns.histplot(BID['score'], bins=30, kde=True, color="purple", alpha=0.6)
+<Axes: xlabel='score', ylabel='Count'>
+>>> plt.xlabel("BID score")
+Text(0.5, 0, 'BID score')
+>>> plt.ylabel("Count")
+Text(0, 0.5, 'Count')
+>>> plt.title("BID score Distribution\nTotal sites: {}".format(num_sites), fontsize=14, fontweight='bold')
+Text(0.5, 1.0, 'BID score Distribution\nTotal sites: 519')
+>>> plt.tight_layout()
+>>> plt.savefig("histograms_BID.png")
+>>> num_sites = len(psi)
+>>> sns.set(style="whitegrid")
+>>> plt.figure(figsize=(8, 4))
+<Figure size 800x400 with 0 Axes>
+>>> sns.histplot(psi['frequency'], bins=30, kde=True, color="orange", alpha=0.6)
+<Axes: xlabel='frequency', ylabel='Count'>
+>>> plt.xlabel("psi frequency")
+Text(0.5, 0, 'psi frequency')
+>>> plt.ylabel("Count")
+Text(0, 0.5, 'Count')
+>>> plt.title("psi frequency Distribution\nTotal sites: {}".format(num_sites), fontsize=14, fontweight='bold')
+Text(0.5, 1.0, 'psi frequency Distribution\nTotal sites: 11823337')
+>>> plt.tight_layout()
+>>> plt.savefig("histograms_psi.png")
+>>> exit()

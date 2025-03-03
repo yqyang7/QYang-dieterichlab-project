@@ -1,0 +1,58 @@
+>>> import pandas as pd
+>>> import seaborn as sns
+>>> import matplotlib.pyplot as plt
+>>> GLO = pd.read_csv("/prj/Qingyang/GLORI.chrALL.tsv", sep=r'\s+', low_memory=False)
+>>> print(GLO.head(10))
+  chrom  chromStart  chromEnd name  score strand ref5mer
+0     1     1600376   1600377  m6A   31.1      +   GGACC
+1     1     1600473   1600474  m6A   15.4      +   GGACT
+2     1     1600621   1600622  m6A   25.7      +   AGACT
+3     1     1601001   1601002  m6A   25.7      +   GGACT
+4     1     1601143   1601144  m6A   18.3      +   GGACC
+5     1     1601203   1601204  m6A   56.6      +   AGACT
+6     1     1601293   1601294  m6A   23.2      +   GAATT
+7     1     1601515   1601516  m6A   45.5      +   AGACC
+8     1     1601840   1601841  m6A   50.6      +   GGACA
+9     1     1602008   1602009  m6A   24.4      +   AGACT
+>>> num_sites = len(GLO)
+>>> sns.set(style="whitegrid")
+>>> plt.figure(figsize=(8, 4))
+<Figure size 800x400 with 0 Axes>
+>>> sns.histplot(GLO['score'], bins=30, kde=True, color="blue", alpha=0.6)
+<Axes: xlabel='score', ylabel='Count'>
+>>> plt.xlabel("GLORI score")
+Text(0.5, 0, 'GLORI score')
+>>> plt.ylabel("Count")
+Text(0, 0.5, 'Count')
+>>> plt.title("GLORI Score Distribution\nTotal sites: {}".format(num_sites), fontsize=14, fontweight='bold')
+Text(0.5, 1.0, 'GLORI Score Distribution\nTotal sites: 214715')
+>>> plt.tight_layout()
+>>> plt.savefig("histograms_GLORI.png")
+>>> m6a = pd.read_csv("/prj/Qingyang/m6A_cov10.bed", sep=r'\s+', low_memory=False)
+>>> print(m6a.head(10))
+  chrom  chromStart  chromEnd name  score strand  thickStart  thickEnd  itemRgb  coverage  frequency
+0     1       14378     14379    a     10      -       14378     14379  255,0,0        10       0.00
+1     1       14381     14382    a     17      -       14381     14382  255,0,0        17       0.00
+2     1       14382     14383    a     14      -       14382     14383  255,0,0        14       0.00
+3     1       14383     14384    a     12      -       14383     14384  255,0,0        12       0.00
+4     1       14385     14386    a     11      -       14385     14386  255,0,0        11       0.00
+5     1       14397     14398    a     12      -       14397     14398  255,0,0        12      25.00
+6     1       14399     14400    a     23      -       14399     14400  255,0,0        23       0.00
+7     1       14400     14401    a     21      -       14400     14401  255,0,0        21       4.76
+8     1       14403     14404    a    142      -       14403     14404  255,0,0       142       1.41
+9     1       14404     14405    a     98      -       14404     14405  255,0,0        98       2.04
+>>> num_sites = len(m6a)
+>>> sns.set(style="whitegrid")
+>>> plt.figure(figsize=(8, 4))
+<Figure size 800x400 with 0 Axes>
+>>> sns.histplot(m6a['frequency'], bins=30, kde=True, color="orange", alpha=0.6)
+<Axes: xlabel='frequency', ylabel='Count'>
+>>> plt.xlabel("m6A frequency")
+Text(0.5, 0, 'm6A frequency')
+>>> plt.ylabel("Count")
+Text(0, 0.5, 'Count')
+>>> plt.title("m6A frequency Distribution\nTotal sites: {}".format(num_sites), fontsize=14, fontweight='bold')
+Text(0.5, 1.0, 'm6A frequency Distribution\nTotal sites: 11829964')
+>>> plt.tight_layout()
+>>> plt.savefig("histograms_m6A.png")
+>>> exit()
