@@ -1,4 +1,4 @@
-# Benchmarking Nanopore-Based RNA Modification Detection
+# 🧬Benchmarking Nanopore-Based RNA Modification Detection
 
 This repository contains code and data processing workflows for the study:
 
