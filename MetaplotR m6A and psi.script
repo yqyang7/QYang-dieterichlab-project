@@ -1,0 +1,158 @@
+> m6a.dist <- read.delim ("m6a.dist.measures.txt", header = T)
+> dim(m6a.dist)
+[1] 82724    14
+> head(m6a.dist)
+   chr  coord gene_name          refseqID rel_location utr5_st utr5_end cds_st cds_end
+1 chr1 942771    SAMD11 ENST00000342066.8     1.624145    1366     1277   1276    -769
+2 chr1 942771    SAMD11 ENST00000616016.4     2.059701    1193     1114   1113      76
+3 chr1 942771    SAMD11 ENST00000616125.4     1.553426    1032      953    952    -769
+4 chr1 942771    SAMD11 ENST00000617307.4     1.574197    1116     1037   1036    -769
+5 chr1 942771    SAMD11 ENST00000618181.4     1.539797     981      902    901    -769
+6 chr1 942771    SAMD11 ENST00000618323.4     1.913043     961      882    881     -84
+  utr3_st utr3_end utr5_size cds_size utr3_size
+1    -770    -1190        89     2045       420
+2      75    -1197        79     1037      1272
+3    -770    -1197        79     1721       427
+4    -770    -1197        79     1805       427
+5    -770    -1197        79     1670       427
+6     -85    -1197        79      965      1112
+> m6a.dist <- read.delim ("m6a_qytest.dist.measures.txt", header = T)
+Error in file(file, "rt") : cannot open the connection
+In addition: Warning message:
+In file(file, "rt") :
+  cannot open file 'm6a_qytest.dist.measures.txt': No such file or directory
+> m6a.dist <- read.delim ("/prj/Qingyang/m6a_qytest.dist.measures.txt", header = T)
+> dim(m6a.dist)
+[1] 82724    14
+> m6aqy.dist <- read.delim ("/prj/Qingyang/m6a_qytest.dist.measures.txt", header = T)
+> dim(m6aqy.dist)
+[1] 82724    14
+> head(m6aqy.dist)
+   chr  coord gene_name          refseqID rel_location utr5_st utr5_end cds_st cds_end
+1 chr1 942771    SAMD11 ENST00000342066.8     1.624145    1366     1277   1276    -769
+2 chr1 942771    SAMD11 ENST00000616016.4     2.059701    1193     1114   1113      76
+3 chr1 942771    SAMD11 ENST00000616125.4     1.553426    1032      953    952    -769
+4 chr1 942771    SAMD11 ENST00000617307.4     1.574197    1116     1037   1036    -769
+5 chr1 942771    SAMD11 ENST00000618181.4     1.539797     981      902    901    -769
+6 chr1 942771    SAMD11 ENST00000618323.4     1.913043     961      882    881     -84
+  utr3_st utr3_end utr5_size cds_size utr3_size
+1    -770    -1190        89     2045       420
+2      75    -1197        79     1037      1272
+3    -770    -1197        79     1721       427
+4    -770    -1197        79     1805       427
+5    -770    -1197        79     1670       427
+6     -85    -1197        79      965      1112
+> library (ggplot2)
+> qplot(m6a.dist$rel_location, geom="histogram") + geom_vline(xintercept = 1:2, col = "grey") + theme_bw()
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Warning message:
+`qplot()` was deprecated in ggplot2 3.4.0.
+This warning is displayed once every 8 hours.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated. 
+> summary(data.frame(m6a.dist$utr5_size, m6a.dist$cds_size, m6a.dist$utr3_size))
+ m6a.dist.utr5_size m6a.dist.cds_size m6a.dist.utr3_size
+ Min.   :   0.0     Min.   :   44     Min.   :    0     
+ 1st Qu.:  93.0     1st Qu.:  923     1st Qu.:  473     
+ Median : 190.0     Median : 1481     Median : 1046     
+ Mean   : 273.8     Mean   : 1909     Mean   : 1567     
+ 3rd Qu.: 352.0     3rd Qu.: 2330     3rd Qu.: 2066     
+ Max.   :7719.0     Max.   :26393     Max.   :32869     
+> # assign the regions to new dataframes
+> utr5.m6a.dist <- m6a.dist[m6a.dist$rel_location < 1, ]
+> cds.m6a.dist <- m6a.dist [m6a.dist$rel_location < 2 & m6a.dist$rel_location >= 1, ]
+> utr3.m6a.dist <- m6a.dist[m6a.dist$rel_location >= 2, ]
+> 
+> # rescale 5'UTR and 3'UTR
+> library("scales")
+> utr5.m6a.dist <- m6a.dist[m6a.dist$rel_location < 1, ]
+> utr5.SF <- median(m6a.dist$utr5_size, na.rm = T)/median(m6a.dist$cds_size, na.rm = T)
+> utr5.m6a.dist$rel_location <- rescale(utr5.m6a.dist$rel_location, to = c(1-utr5.SF, 1), from = c(0,1))
+> utr3.SF <- median(m6a.dist$utr3_size, na.rm = T)/median(m6a.dist$cds_size, na.rm = T)
+> cds.m6a.dist <- m6a.dist [m6a.dist$rel_location < 2 & m6a.dist$rel_location >= 1, ]
+> utr3.m6a.dist <- m6a.dist[m6a.dist$rel_location >= 2, ]
+> library("scales")
+> utr3.m6a.dist$rel_location <- rescale(utr3.m6a.dist$rel_location, to = c(2, 2+utr3.SF), from = c(2,3))
+> m6a.metagene.coord <- c(utr5.m6a.dist$rel_location, cds.m6a.dist$rel_location, utr3.m6a.dist$rel_location)
+> p <- qplot(m6a.metagene.coord, geom="histogram") + geom_vline(xintercept = 1:2, col = "grey") + theme_bw()
+> 
+> qplot(m6a.metagene.coord, geom="freqpoly") + geom_vline(xintercept = 1:2, col = "red") + theme_bw()
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+> qplot(m6a.metagene.coord, geom="density") + geom_vline(xintercept = 1:2, col = "red") + theme_bw()
+> psi.dist <- read.delim ("/prj/Qingyang/psi.dist.measures.txt", header = T)
+> dim(psi.dist)
+[1] 23037782       14
+> head(psi.dist)
+   chr  coord gene_name          refseqID rel_location utr5_st utr5_end cds_st cds_end
+1 chr1 925929    SAMD11 ENST00000342066.8    0.8666667      77      -12    -13   -2058
+2 chr1 925929    SAMD11 ENST00000616016.4    0.8500000      67      -12    -13   -1050
+3 chr1 925929    SAMD11 ENST00000616125.4    0.8500000      67      -12    -13   -1734
+4 chr1 925929    SAMD11 ENST00000617307.4    0.8500000      67      -12    -13   -1818
+5 chr1 925929    SAMD11 ENST00000618181.4    0.8500000      67      -12    -13   -1683
+6 chr1 925929    SAMD11 ENST00000618323.4    0.8500000      67      -12    -13    -978
+  utr3_st utr3_end utr5_size cds_size utr3_size
+1   -2059    -2479        89     2045       420
+2   -1051    -2323        79     1037      1272
+3   -1735    -2162        79     1721       427
+4   -1819    -2246        79     1805       427
+5   -1684    -2111        79     1670       427
+6    -979    -2091        79      965      1112
+> qplot(psi.dist$rel_location, geom="histogram") + geom_vline(xintercept = 1:2, col = "grey") + theme_bw()
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+> summary(data.frame(psi.dist$utr5_size, psi.dist$cds_size, psi.dist$utr3_size))
+ psi.dist.utr5_size psi.dist.cds_size psi.dist.utr3_size
+ Min.   :   0.0     Min.   :   41     Min.   :    0     
+ 1st Qu.:  93.0     1st Qu.:  986     1st Qu.:  542     
+ Median : 189.0     Median : 1595     Median : 1427     
+ Mean   : 260.9     Mean   : 2057     Mean   : 2072     
+ 3rd Qu.: 337.0     3rd Qu.: 2579     3rd Qu.: 2883     
+ Max.   :7719.0     Max.   :26771     Max.   :32869     
+> utr5.SF <- median(psi.dist$utr5_size, na.rm = T)/median(psi.dist$cds_size, na.rm = T)
+> utr3.SF <- median(psi.dist$utr3_size, na.rm = T)/median(psi.dist$cds_size, na.rm = T)
+> utr5.psi.dist <- psi.dist[psi.dist$rel_location < 1, ]
+> cds.psi.dist <- psi.dist [psi.dist$rel_location < 2 & psi.dist$rel_location >= 1, ]
+> utr3.psi.dist <- psi.dist[psi.dist$rel_location >= 2, ]
+> 
+> library("scales")
+> utr5.psi.dist$rel_location <- rescale(utr5.psi.dist$rel_location, to = c(1-utr5.SF, 1), from = c(0,1))
+> utr3.psi.dist$rel_location <- rescale(utr3.psi.dist$rel_location, to = c(2, 2+utr3.SF), from = c(2,3))
+> 
+> psi.metagene.coord <- c(utr5.psi.dist$rel_location, cds.psi.dist$rel_location, utr3.psi.dist$rel_location)
+> p <- qplot(psi.metagene.coord, geom="histogram") + geom_vline(xintercept = 1:2, col = "grey") + theme_bw()
+> 
+> qplot(psi.metagene.coord, geom="freqpoly") + geom_vline(xintercept = 1:2, col = "red") + theme_bw()
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+> qplot(psi.metagene.coord, geom="density") + geom_vline(xintercept = 1:2, col = "red") + theme_bw()
+> # Read in metagene coordinates 
+> metagene.cord <- c(m6a.metagene.coord, psi.metagene.coord)
+> mod <- c(rep("m6A", length(m6a.metagene.coord)), 
++          rep("psi", length(psi.metagene.coord))) 
+> df <- data.frame(metagene.cord, mod)
+> ggplot(df) + geom_density(aes(x = metagene.cord, colour = mod)) + xlim(0, 3) + 
++     theme_bw() + geom_vline(xintercept = 1:2, col = "grey")
+> head(m6a.dist[,6:11])
+  utr5_st utr5_end cds_st cds_end utr3_st utr3_end
+1    1366     1277   1276    -769    -770    -1190
+2    1193     1114   1113      76      75    -1197
+3    1032      953    952    -769    -770    -1197
+4    1116     1037   1036    -769    -770    -1197
+5     981      902    901    -769    -770    -1197
+6     961      882    881     -84     -85    -1197
+> qplot(m6a.dist$utr3_st, geom="histogram") + xlim (-500,500) + geom_vline(xintercept = 1:2, col = "grey") + theme_bw()
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Warning messages:
+1: Removed 34227 rows containing non-finite outside the scale range (`stat_bin()`). 
+2: Removed 2 rows containing missing values or values outside the scale range (`geom_bar()`). 
+> head(psi.dist[,6:11])
+  utr5_st utr5_end cds_st cds_end utr3_st utr3_end
+1      77      -12    -13   -2058   -2059    -2479
+2      67      -12    -13   -1050   -1051    -2323
+3      67      -12    -13   -1734   -1735    -2162
+4      67      -12    -13   -1818   -1819    -2246
+5      67      -12    -13   -1683   -1684    -2111
+6      67      -12    -13    -978    -979    -2091
+> qplot(psi.dist$utr3_st, geom="histogram") + xlim (-500,500) + geom_vline(xintercept = 1:2, col = "grey") + theme_bw()
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+Warning messages:
+1: Removed 15448040 rows containing non-finite outside the scale range (`stat_bin()`). 
+2: Removed 2 rows containing missing values or values outside the scale range (`geom_bar()`). 
+Session restored from your saved work on 2025-May-03 22:08:07 UTC (15 days ago)
