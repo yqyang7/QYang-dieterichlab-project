@@ -17,10 +17,12 @@ This project compares two major types of RNA modifications — **m6A (N6-methyla
 
 ### ψ Datasets
 
-- `psi.bed`: Nanopore-based pseudouridine prediction (Dai et al., 2023)
-- `bid_psi.bed`: BID-seq chemical derivatization results
+- `psi_cov10.bed`: Nanopore-based pseudouridine prediction (Dorado v0.8.2)(Dai et al., 2023)
+- `BID_seq_HEK293T.bed `: BID-based pseudouridine measurements ([Dai et al., 2023](https://www.nature.com/articles/s41587-022-01505-w))
 
 ### Genome Reference
 
 Sequence context (5-mer) extraction was based on the GRCh38 genome build:
+/biodb/genomes/homo_sapiens/GRCh38_102/GRCh38_102.fa
+
 
